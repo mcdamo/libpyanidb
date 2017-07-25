@@ -1,0 +1,10 @@
+# config for libpyanidb
+# do not leave spaces between key=pairs
+
+# AniDb API
+user=anidbuser
+password=anidbpass
+
+# Local caching database, supported databases are mysql and sqlite3
+dburl=mysql://hostname/databasename?user=dbuser&password=dbpass
+
