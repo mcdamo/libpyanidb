@@ -17,7 +17,7 @@ class AniDBInterface:
 		self.cache=True
 		dburl=dburl and parse_database_url(dburl) or None
 		self.dburl=dburl
-		self.db=dburl and Database(dburl[1],dburl[2],dburl[3],dburl[4])
+		self.db=dburl and Database(dburl[0],dburl[1],dburl[2],dburl[3],dburl[4])
 	
 	def handle_response(self,response):
 		if response.rescode in ('501','506') and self.user and self.password and response.req.command!='AUTH':

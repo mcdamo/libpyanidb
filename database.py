@@ -1,6 +1,3 @@
-import sqlite3
-import os
-
 def parse_database_url(url):
 	proto,url=url.split('://',1)
 	host,url=url.rsplit('/',1)
@@ -15,11 +12,19 @@ def parse_database_url(url):
 	return proto,host,db,user,password
 
 class Database(object):
-	def __init__(self,server,database,username,password):
-		self.server,self.database,self.username,self.password=server,database,username,password
-		self.connection=sqlite3.connect(os.path.join(server,database))
+	def __init__(self,dbtype,server,database,username,password):
+		self.dbtype,self.server,self.database,self.username,self.password=dbtype,server,database,username,password
+		if dbtype == 'sqlite3':
+			import sqlite3
+			import os
+			self.connection=sqlite3.connect(os.path.join(server,database))
+		elif dbtype == 'mysql':
+			import MySQLdb
+			self.connection=MySQLdb.connect(host=server,user=username,passwd=password,db=database)
+		else:
+			raise Exception("Unexpected database type: %s" % dbtype)
 		self.db=self.connection.cursor()
-		self.log=None
+		self.log=self.print_log
 
 	def _query(self,*args):
 		args=list(args)
@@ -28,13 +33,16 @@ class Database(object):
 		return ' '.join(args)
 
 	def execute(self,query,*args):
+		if self.dbtype == 'mysql':
+			query = query.replace('?','%s')
 		if self.log:
-			self.log("DbIO > "+query.replace('?','%s')%args)
+			self.log("DbIO > "+query%self.connection.literal(args))
 		if args==():
 			self.db.execute(query)
 		else:
 			self.db.execute(query,args)
-		self.connection.commit()
+		if self.dbtype == 'sqlite3':
+			self.connection.commit()
 		result=list(self.db.fetchall())
 		if self.log:
 			self.log("DbIO < "+str(result))
@@ -69,3 +77,5 @@ class Database(object):
 				condition and "WHERE "+condition or '')
 		return self.execute(qry,*args)
 
+	def print_log(self,log):
+		print log
