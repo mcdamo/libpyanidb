@@ -9,8 +9,8 @@ CREATE TABLE `atb` (
   `tempvotes` mediumint(8) unsigned default NULL,
   `reviewrating` smallint(5) unsigned default NULL,
   `reviews` mediumint(8) unsigned default NULL,
-  `aired` bigint(20) unsigned default NULL,
-  `ended` bigint(20) unsigned default NULL,
+  `aired` bigint(20) default NULL,
+  `ended` bigint(20) default NULL,
   `apid` text,
   `annid` text,
   `allcid` text,
@@ -32,14 +32,14 @@ CREATE TABLE `atb` (
   `awards` text,
   `status` int(10) unsigned default NULL,
   PRIMARY KEY  (`aid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `dtb` (
   `did` mediumint(8) unsigned NOT NULL default '0',
   `name` text,
   `status` int(10) unsigned default NULL,
   PRIMARY KEY  (`did`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `etb` (
   `eid` int(10) unsigned NOT NULL default '0',
@@ -53,7 +53,7 @@ CREATE TABLE `etb` (
   `kanji` text,
   `status` int(10) unsigned default NULL,
   PRIMARY KEY  (`eid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ftb` (
   `fid` bigint(20) unsigned NOT NULL default '0',
@@ -82,7 +82,7 @@ CREATE TABLE `ftb` (
   `filename` mediumtext,
   `status` int(10) unsigned default NULL,
   PRIMARY KEY  (`fid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `gtb` (
   `gid` mediumint(8) unsigned default NULL,
@@ -96,7 +96,7 @@ CREATE TABLE `gtb` (
   `ircserver` text,
   `url` text,
   `status` int(10) unsigned default NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `jtb` (
   `did` mediumint(8) unsigned default NULL,
@@ -111,7 +111,7 @@ CREATE TABLE `jtb` (
   `lid` bigint(20) unsigned default NULL,
   `uid` mediumint(8) unsigned default NULL,
   `status` int(10) unsigned default NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ltb` (
   `lid` bigint(20) unsigned default NULL,
@@ -126,7 +126,7 @@ CREATE TABLE `ltb` (
   `source` text,
   `other` text,
   `status` int(10) unsigned default NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ptb` (
   `pid` mediumint(8) unsigned default NULL,
@@ -137,4 +137,4 @@ CREATE TABLE `ptb` (
   `pic` text,
   `url` text,
   `status` int(10) unsigned default NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
