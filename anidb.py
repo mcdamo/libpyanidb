@@ -4,7 +4,7 @@ from commands import *
 from errors import *
 
 class AniDBInterface:
-	def __init__(self,clientname='libpyanidb',clientver='3',server='api.anidb.info',port=9000,myport=9876,user=None,password=None,session=None,dburl=None):
+	def __init__(self,clientname='libpyanidb',clientver='3',server='api.anidb.info',port=9000,myport=9876,user=None,password=None,session=None,dburl=None,cache_days=1,cache_ended=False):
 		self.clientname=clientname
 		self.clientver=clientver
 
@@ -18,6 +18,8 @@ class AniDBInterface:
 		dburl=dburl and parse_database_url(dburl) or None
 		self.dburl=dburl
 		self.db=dburl and Database(dburl[0],dburl[1],dburl[2],dburl[3],dburl[4])
+		self.db.cache_days=cache_days
+		self.db.cache_ended=cache_ended
 	
 	def handle_response(self,response):
 		if response.rescode in ('501','506') and self.user and self.password and response.req.command!='AUTH':

@@ -8,3 +8,7 @@ password=anidbpass
 # Local caching database, supported databases are mysql and sqlite3
 dburl=mysql://hostname/databasename?user=dbuser&password=dbpass
 
+# Fetch Anime from db cache if the record was updated within this many days
+#cache_days=1
+# Fetch Anime from db cache if it is marked as Ended
+#cache_ended=false

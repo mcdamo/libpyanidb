@@ -16,6 +16,13 @@ class Config(DefaultDict):
 			if line=='':
 				continue
 			key,value=line.split('=',1)
+			if key=='cache_days':
+				value=int(value)
+			if key=='cache_ended':
+				if value.lower()=='true' or value.lower()=='yes' or value=='1':
+					value=True
+				else:
+					value=False
 			self[key]=value
 		f.close()
 

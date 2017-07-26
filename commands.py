@@ -145,7 +145,25 @@ class AnimeCommand(Command):
 		ruleholder=(aid and 'aid=?' or '(name=? OR romaji=? OR kanji=? OR othername=? OR shortnames RLIKE ? OR synonyms RLIKE ?)')
 		rulevalues=(aid and [aid] or [aname,aname,aname,aname,"('|^)"+aname+"('|$)","('|^)"+aname+"('|$)"])
 		
-		rows=db.select('atb',names,ruleholder+" AND status&8",*rulevalues)
+		# The default behaviour would always use the local cache after the record had been
+		# queried twice and updated with 'set status=15'
+		# This is a problem for Anime that are still in progress and may need to be updated.
+		# These options will override the default caching behaviour for Anime:
+		#   db.cache_days=X     use cache if record is newer than X days
+		#   db.cache_ended=Bool use cache if Anime has ended
+		cacherules=" AND status&8"
+		if( db.cache_days > 0 or db.cache_ended==True ):
+			qended=""
+			qdays="" 
+			qor=""
+			if db.cache_days > 0:
+				qdays="DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL %s DAY) <= updated" %db.cache_days #TODO MySQL specific
+			if( db.cache_days > 0 and db.cache_ended==True ):
+				qor="OR"
+			if db.cache_ended==True:
+				qended="ended > 0"
+			cacherules=" AND (%s %s %s)" %(qended,qor,qdays)
+		rows=db.select('atb',names,ruleholder+" "+cacherules,*rulevalues)
 		
 		if len(rows)>1:
 			raise AniDBInternalError,"It shouldn't be possible for database to return more than 1 line for ANIME cache"
