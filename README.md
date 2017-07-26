@@ -14,6 +14,6 @@ You will require an [AniDB](https://anidb.net) account to use the API
 A basic commandline interface is included that will can query (and cache) Anime info only.
 
 * Use included database_schema.sql to create a MySQL database for caching
-* Copy dotlibpyanidb.sample as ~/.libpyanidb
-* Update ~/.libpyanidb with your AniDB account and MySQL database credentials
-* Run: cli/anidbcli.py --help
+* Copy dotlibpyanidb.sample as ~/.libpyanidb or /etc/libpyanidb.conf
+* Update config with your AniDB account and MySQL database credentials
+* Run: python cli/anidbcli.py --help

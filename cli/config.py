@@ -8,7 +8,16 @@ class Config(DefaultDict):
 		self.load()
 
 	def load(self):
-		f=file(os.path.expanduser("~/.libpyanidb"))
+		path="~/.libpyanidb"
+		try:
+			f=file(os.path.expanduser(path))
+		except (OSError, IOError) as e:
+			try:
+				path="/etc/libpyanidb.conf"
+				f=file(os.path.expanduser(path))
+			except (OSError, IOError) as e:
+				print "Config not found"
+				exit(2)
 		for line in f:
 			line=line.strip()
 			if line.startswith('#'):
