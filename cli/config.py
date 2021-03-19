@@ -10,13 +10,13 @@ class Config(DefaultDict):
 	def load(self):
 		path="~/.libpyanidb"
 		try:
-			f=file(os.path.expanduser(path))
+			f=open(os.path.expanduser(path))
 		except (OSError, IOError) as e:
 			try:
 				path="/etc/libpyanidb.conf"
-				f=file(os.path.expanduser(path))
+				f=open(os.path.expanduser(path))
 			except (OSError, IOError) as e:
-				print "Config not found"
+				print("Config not found")
 				exit(2)
 		for line in f:
 			line=line.strip()
@@ -36,7 +36,7 @@ class Config(DefaultDict):
 		f.close()
 
 	def save(self):
-		f=file(os.path.expanduser("~/.libpyanidb"),'w')
+		f=open(os.path.expanduser("~/.libpyanidb"),'w')
 		for key in self:
 			f.write(str(key)+'='+str(self[key])+'\n')
 		f.close()

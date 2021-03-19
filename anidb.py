@@ -41,7 +41,7 @@ class AniDBInterface:
 			cached=command.cached(self,self.db)
 			if cached:
 				if self.mode==0:
-					raise RuntimeError,"Mode not yet supported"
+					raise RuntimeError("Mode not yet supported")
 				elif self.mode==1:
 					return cached
 				elif self.mode==2:
@@ -58,7 +58,7 @@ class AniDBInterface:
 			try:
 				command.resp
 			except:
-				raise AniDBCommandTimeoutError,"Command has timed out"
+				raise AniDBCommandTimeoutError("Command has timed out")
 			self.handle_response(command.resp)
 			return command.resp
 
@@ -618,7 +618,7 @@ class AniDBInterface:
 		it's better that way, let it go as utf8 to databases etc. because then you've the real data stored
 		
 		"""
-		raise AniDBStupidUserError,"pylibanidb sets the encoding to utf8 as default and it's stupid to use any other encoding. you WILL lose some data if you use other encodings, and now you've been warned. you will need to modify the code yourself if you want to do something as stupid as changing the encoding"
+		raise AniDBStupidUserError("pylibanidb sets the encoding to utf8 as default and it's stupid to use any other encoding. you WILL lose some data if you use other encodings, and now you've been warned. you will need to modify the code yourself if you want to do something as stupid as changing the encoding")
 		return self.handle(EncodingCommand(name),callback)
 
 	def sendmsg(self,to,title,body,callback=None):

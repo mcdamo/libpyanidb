@@ -38,7 +38,7 @@ class Command:
 	
 	def flatten(self,command,parameters):
 		tmp=[]
-		for key,value in parameters.iteritems():
+		for key,value in iter(parameters.items()):
 			if value==None:
 				continue
 			tmp.append("%s=%s"%(self.escape(key),self.escape(value)))
@@ -100,7 +100,7 @@ class NotifyAckCommand(Command):
 class BuddyAddCommand(Command):
 	def __init__(self,uid=None,uname=None):
 		if not (uid or uname) or (uid and uname):
-			raise AniDBIncorrectParameterError,"You must provide <u(id|name)> for BUDDYADD command"
+			raise AniDBIncorrectParameterError("You must provide <u(id|name)> for BUDDYADD command")
 		parameters={'uid':uid,'uname':uname.lower()}
 		Command.__init__(self,'BUDDYADD',**parameters)
 
@@ -133,7 +133,7 @@ class BuddyStateCommand(Command):
 class AnimeCommand(Command):
 	def __init__(self,aid=None,aname=None,acode=None):
 		if not (aid or aname) or (aid and aname):
-			raise AniDBIncorrectParameterError,"You must provide <a(id|name)> for ANIME command"
+			raise AniDBIncorrectParameterError("You must provide <a(id|name)> for ANIME command")
 		parameters={'aid':aid,'aname':aname,'acode':acode}
 		Command.__init__(self,'ANIME',**parameters)
 	
@@ -166,7 +166,7 @@ class AnimeCommand(Command):
 		rows=db.select('atb',names,ruleholder+" "+cacherules,*rulevalues)
 		
 		if len(rows)>1:
-			raise AniDBInternalError,"It shouldn't be possible for database to return more than 1 line for ANIME cache"
+			raise AniDBInternalError("It shouldn't be possible for database to return more than 1 line for ANIME cache")
 		elif not len(rows):
 			return None
 		else:
@@ -197,7 +197,7 @@ class AnimeCommand(Command):
 class EpisodeCommand(Command):
 	def __init__(self,eid=None,aid=None,aname=None,epno=None):
 		if not (eid or ((aname or aid) and epno)) or (aname and aid) or (eid and (aname or aid or epno)):
-			raise AniDBIncorrectParameterError,"You must provide <eid XOR a(id|name)+epno> for EPISODE command"
+			raise AniDBIncorrectParameterError("You must provide <eid XOR a(id|name)+epno> for EPISODE command")
 		parameters={'eid':eid,'aid':aid,'aname':aname,'epno':epno}
 		Command.__init__(self,'EPISODE',**parameters)
 	
@@ -227,7 +227,7 @@ class EpisodeCommand(Command):
 		rows=db.select('etb',names,ruleholder+" AND status&8",*rulevalues)
 
 		if len(rows)>1:
-			raise AniDBInternalError,"It shouldn't be possible for database to return more than 1 line for EPISODE cache"
+			raise AniDBInternalError("It shouldn't be possible for database to return more than 1 line for EPISODE cache")
 		elif not len(rows):
 			return None
 		else:
@@ -255,7 +255,7 @@ class EpisodeCommand(Command):
 class FileCommand(Command):
 	def __init__(self,fid=None,size=None,ed2k=None,aid=None,aname=None,gid=None,gname=None,epno=None,fmask=None,amask=None):
 		if not (fid or (size and ed2k) or ((aid or aname) and (gid or gname) and epno)) or (fid and (size or ed2k or aid or aname or gid or gname or epno)) or ((size and ed2k) and (fid or aid or aname or gid or gname or epno)) or (((aid or aname) and (gid or gname) and epno) and (fid or size or ed2k)) or (aid and aname) or (gid and gname):
-			raise AniDBIncorrectParameterError,"You must provide <fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for FILE command"
+			raise AniDBIncorrectParameterError("You must provide <fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for FILE command")
 		parameters={'fid':fid,'size':size,'ed2k':ed2k,'aid':aid,'aname':aname,'gid':gid,'gname':gname,'epno':epno,'fmask':fmask,'amask':amask}
 		Command.__init__(self,'FILE',**parameters)
 	
@@ -344,7 +344,7 @@ class FileCommand(Command):
 class GroupCommand(Command):
 	def __init__(self,gid=None,gname=None):
 		if not (gid or gname) or (gid and gname):
-			raise AniDBIncorrectParameterError,"You must provide <g(id|name)> for GROUP command"
+			raise AniDBIncorrectParameterError("You must provide <g(id|name)> for GROUP command")
 		parameters={'gid':gid,'gname':gname}
 		Command.__init__(self,'GROUP',**parameters)
 	
@@ -360,7 +360,7 @@ class GroupCommand(Command):
 		rows=db.select('gtb',names,ruleholder+" AND status&8",*rulevalues)
 		
 		if len(rows)>1:
-			raise AniDBInternalError,"It shouldn't be possible for database to return more than 1 line for GROUP cache"
+			raise AniDBInternalError("It shouldn't be possible for database to return more than 1 line for GROUP cache")
 		elif not len(rows):
 			return None
 		else:
@@ -388,7 +388,7 @@ class GroupCommand(Command):
 class ProducerCommand(Command):
 	def __init__(self,pid=None,pname=None):
 		if not (pid or pname) or (pid and pname):
-			raise AniDBIncorrectParameterError,"You must provide <p(id|name)> for PRODUCER command"
+			raise AniDBIncorrectParameterError("You must provide <p(id|name)> for PRODUCER command")
 		parameters={'pid':pid,'pname':pname}
 		Command.__init__(self,'PRODUCER',**parameters)
 	
@@ -404,7 +404,7 @@ class ProducerCommand(Command):
 		rows=db.select('ptb',names,ruleholder+" AND status&8",*rulevalues)
 		
 		if len(rows)>1:
-			raise AniDBInternalError,"It shouldn't be possible for database to return more than 1 line for PRODUCER cache"
+			raise AniDBInternalError("It shouldn't be possible for database to return more than 1 line for PRODUCER cache")
 		elif not len(rows):
 			return None
 		else:
@@ -432,7 +432,7 @@ class ProducerCommand(Command):
 class MyListCommand(Command):
 	def __init__(self,lid=None,fid=None,size=None,ed2k=None,aid=None,aname=None,gid=None,gname=None,epno=None):
 		if not (lid or fid or (size and ed2k) or (aid or aname)) or (lid and (fid or size or ed2k or aid or aname or gid or gname or epno)) or (fid and (lid or size or ed2k or aid or aname or gid or gname or epno)) or ((size and ed2k) and (lid or fid or aid or aname or gid or gname or epno)) or ((aid or aname) and (lid or fid or size or ed2k)) or (aid and aname) or (gid and gname):
-			raise AniDBIncorrectParameterError,"You must provide <lid XOR fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for MYLIST command"
+			raise AniDBIncorrectParameterError("You must provide <lid XOR fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for MYLIST command")
 		parameters={'lid':lid,'fid':fid,'size':size,'ed2k':ed2k,'aid':aid,'aname':aname,'gid':gid,'gname':gname,'epno':epno}
 		Command.__init__(self,'MYLIST',**parameters)
 
@@ -519,14 +519,14 @@ class MyListCommand(Command):
 class MyListAddCommand(Command):
 	def __init__(self,lid=None,fid=None,size=None,ed2k=None,aid=None,aname=None,gid=None,gname=None,epno=None,edit=None,state=None,viewed=None,source=None,storage=None,other=None):
 		if not (lid or fid or (size and ed2k) or ((aid or aname) and (gid or gname))) or (lid and (fid or size or ed2k or aid or aname or gid or gname or epno)) or (fid and (lid or size or ed2k or aid or aname or gid or gname or epno)) or ((size and ed2k) and (lid or fid or aid or aname or gid or gname or epno)) or (((aid or aname) and (gid or gname)) and (lid or fid or size or ed2k)) or (aid and aname) or (gid and gname) or (lid and not edit):
-			raise AniDBIncorrectParameterError,"You must provide <lid XOR fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for MYLISTADD command"
+			raise AniDBIncorrectParameterError("You must provide <lid XOR fid XOR size+ed2k XOR a(id|name)+g(id|name)+epno> for MYLISTADD command")
 		parameters={'lid':lid,'fid':fid,'size':size,'ed2k':ed2k,'aid':aid,'aname':aname,'gid':gid,'gname':gname,'epno':epno,'edit':edit,'state':state,'viewed':viewed,'source':source,'storage':storage,'other':other}
 		Command.__init__(self,'MYLISTADD',**parameters)
 
 class MyListDelCommand(Command):
 	def __init__(self,lid=None,fid=None,aid=None,aname=None,gid=None,gname=None,epno=None):
 		if not (lid or fid or ((aid or aname) and (gid or gname) and epno)) or (lid and (fid or aid or aname or gid or gname or epno)) or (fid and (lid or aid or aname or gid or gname or epno)) or (((aid or aname) and (gid or gname) and epno) and (lid or fid)) or (aid and aname) or (gid and gname):
-			raise AniDBIncorrectParameterError,"You must provide <lid+edit=1 XOR fid XOR a(id|name)+g(id|name)+epno> for MYLISTDEL command"
+			raise AniDBIncorrectParameterError("You must provide <lid+edit=1 XOR fid XOR a(id|name)+g(id|name)+epno> for MYLISTDEL command")
 		parameters={'lid':lid,'fid':fid,'aid':aid,'aname':aname,'gid':gid,'gname':gname,'epno':epno}
 		Command.__init__(self,'MYLISTDEL',**parameters)
 
@@ -537,7 +537,7 @@ class MyListStatsCommand(Command):
 class VoteCommand(Command):
 	def __init__(self,type,id=None,name=None,value=None,epno=None):
 		if not (id or name) or (id and name):
-			raise AniDBIncorrectParameterError,"You must provide <(id|name)> for VOTE command"
+			raise AniDBIncorrectParameterError("You must provide <(id|name)> for VOTE command")
 		parameters={'type':type,'id':id,'name':name,'value':value,'epno':epno}
 		Command.__init__(self,'VOTE',**parameters)
 
@@ -565,7 +565,7 @@ class EncodingCommand(Command):
 class SendMsgCommand(Command):
 	def __init__(self,to,title,body):
 		if len(title)>50 or len(body)>900:
-			raise AniDBIncorrectParameterError,"Title must not be longer than 50 chars and body must not be longer than 900 chars for SENDMSG command"
+			raise AniDBIncorrectParameterError("Title must not be longer than 50 chars and body must not be longer than 900 chars for SENDMSG command")
 		parameters={'to':to.lower(),'title':title,'body':body}
 		Command.__init__(self,'SENDMSG',**parameters)
 

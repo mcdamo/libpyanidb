@@ -13,7 +13,7 @@ def pkcs5padding_strip(data):
 	bytes=ord(data[-1])
 	for byte in data[-bytes:]:
 		if ord(byte)!=bytes:
-			raise ValueError,"depadding failed"
+			raise ValueError("depadding failed")
 	return data[:-bytes]
 
 class ed2k_new:

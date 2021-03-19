@@ -10,6 +10,7 @@ class ResponseResolver:
 		self.datalines=datalines
 
 	def parse(self,data):
+		data=data.decode() # decode bytes to str
 		resline=data.split('\n',1)[0]
 		lines=data.split('\n')[1:-1]
 

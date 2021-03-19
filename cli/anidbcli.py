@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 ## this block loads anidb library from LOCAL RELATIVE path
 ## http://stackoverflow.com/questions/279237/import-a-module-from-a-relative-path
@@ -31,15 +31,15 @@ class Main(object):
 		try:
 			opts, args = getopt.getopt(sys.argv[1:],"ha:",['help','adbid='])
 		except getopt.GetoptError:
-			print sys.argv[0]+' -h'
+			print(sys.argv[0]+' -h')
 			sys.exit(2)
 		if not opts:
-			print "-h for help"
+			print("-h for help")
 			sys.exit(1)
 		for opt, arg in opts:
 			if opt in ('-h','--help'):
-				print sys.argv[0]+' -a id1[,id2[,..]]'
-				print "\t-a cache listed anidbIDs in database"
+				print(sys.argv[0]+' -a id1[,id2[,..]]')
+				print("\t-a cache listed anidbIDs in database")
 				sys.exit(1)
 			elif opt in ('-a','--adbid'):
 				self.adbids = arg.split(',')
@@ -48,7 +48,7 @@ class Main(object):
 		self.intr.auth(self.config['user'],self.config['password'])
 		for id in self.adbids:
 			ret = self.intr.anime(aid=id)
-			print id,ret.rescode,ret.resstr
+			print("{} {} {}".format(id,ret.rescode,ret.resstr))
 
 try:
 	main=Main.__new__(Main)

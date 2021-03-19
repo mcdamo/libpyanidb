@@ -1,7 +1,7 @@
 import socket,sys,zlib
 from time import time,sleep
 from Crypto.Cipher.AES import new as aes
-from md5 import md5
+from hashlib import md5
 from hashes import pkcs5padding_pad,pkcs5padding_strip
 from threading import Thread
 from responses import ResponseResolver
@@ -33,7 +33,7 @@ class AniDBLink(Thread):
 		self.start()
 	
 	def print_log(self,data):
-		print data
+		print(data)
 	
 	def run(self):
 		while 1:
@@ -42,7 +42,7 @@ class AniDBLink(Thread):
 			except socket.timeout:
 				self._handle_timeouts()
 				continue
-			self.log("NetIO < %s"%repr(data))
+			self.log("NetIO < {}".format(repr(data)))
 			try:
 				for i in range(2):
 					try:
@@ -51,10 +51,10 @@ class AniDBLink(Thread):
 						if self.crypt:
 							tmp=self.crypt.decrypt(tmp)
 							tmp=pkcs5padding_strip(tmp)
-							self.log("DeCry | %s"%repr(tmp))
+							self.log("DeCry | {}".format(repr(tmp)))
 						if tmp[:2]=='\x00\x00':
 							tmp=zlib.decompressobj().decompress(tmp[2:])
-							self.log("UnZip | %s"%repr(tmp))
+							self.log("UnZip | {}".format(repr(tmp)))
 						resp=ResponseResolver(tmp)
 					except:
 						sys.excepthook(*sys.exc_info())
@@ -63,7 +63,7 @@ class AniDBLink(Thread):
 					else:
 						break
 				if not resp:
-					raise AniDBPacketCorrupted,"Either decrypting, decompressing or parsing the packet failed"
+					raise AniDBPacketCorruptedError("Either decrypting, decompressing or parsing the packet failed")
 				cmd=self._cmd_dequeue(resp)
 				resp=resp.resolve(cmd)
 				resp.parse()
@@ -76,7 +76,7 @@ class AniDBLink(Thread):
 					self.crypt=None
 				if resp.rescode in ('504','555'):
 					self.banned=True
-					print "AniDB API informs that user or client is banned:",resp.resstr
+					print("AniDB API informs that user or client is banned: {}".format(resp.resstr))
 				resp.handle()
 				if not cmd or not cmd.mode:
 					self._resp_queue(resp)
@@ -84,7 +84,7 @@ class AniDBLink(Thread):
 					self.tags.remove(resp.restag)
 			except:
 				sys.excepthook(*sys.exc_info())
-				print "Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting"
+				print("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
 				self.sock.close()
 				try:cmd.waiter.release()
 				except:pass
@@ -139,18 +139,18 @@ class AniDBLink(Thread):
 	
 	def _send(self,command):
 		if self.banned:
-			print "NetIO | BANNED"
-			raise AniDBError,"Not sending, banned"
+			print("NetIO | BANNED")
+			raise AniDBError("Not sending, banned")
 		self._do_delay()
 		self.lastpacket=time()
 		command.started=time()
 		data=command.raw_data()
 		if self.crypt:
-			self.log("EnCry | %s"%repr(data))
+			self.log("EnCry | {}".format(repr(data)))
 			data=pkcs5padding_pad(data)
 			data=self.crypt.encrypt(data)
-		self.sock.sendto(data,self.target)
-		self.log("NetIO > %s"%repr(data))
+		self.sock.sendto(data.encode(),self.target) # encode str to bytes
+		self.log("NetIO > {}".format(repr(data)))
 	
 	def new_tag(self):
 		if not len(self.tags):
@@ -162,7 +162,7 @@ class AniDBLink(Thread):
 	
 	def request(self,command):
 		if not (self.session and command.session) and command.command not in ('AUTH','PING','ENCRYPT'):
-			raise AniDBMustAuthError,"You must be authed to execute commands besides AUTH and PING"
+			raise AniDBMustAuthError("You must be authed to execute commands besides AUTH and PING")
 		command.started=time()
 		self._cmd_queue(command)
 		self._send(command)

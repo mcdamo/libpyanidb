@@ -38,7 +38,7 @@ class ListDict(object):
 	def append(self,item):
 		key,value=item
 		if not isinstance(key,basestring):
-			raise TypeError,"ListDict keys must be strings"
+			raise TypeError("ListDict keys must be strings")
 		if key not in self.order:
 			self.order.append(key)
 		self.values[key]=value
@@ -49,7 +49,7 @@ class ListDict(object):
 		elif isinstance(index,basestring):
 			return self.values[index]
 		else:
-			raise TypeError,"ListDict indices must be either integers or strings"
+			raise TypeError("ListDict indices must be either integers or strings")
 	
 	def __setitem__(self,key,value):
 		if isinstance(key,int):
@@ -58,7 +58,7 @@ class ListDict(object):
 		elif isinstance(key,basestring):
 			self.append((key,value))
 		else:
-			raise TypeError,"ListDict indices must be either integers or strings"
+			raise TypeError("ListDict indices must be either integers or strings")
 	
 	def __delitem__(self,key):
 		self.remove(key)
@@ -73,7 +73,7 @@ class ListDict(object):
 		elif isinstance(index,basestring):
 			index=self.order.index(key)
 		else:
-			raise TypeError,"ListDict indices must be either integers or strings"
+			raise TypeError("ListDict indices must be either integers or strings")
 		del self.order[index]
 		del self.values[key]
 	
