@@ -5,6 +5,7 @@ from hashlib import md5
 from hashes import pkcs5padding_pad,pkcs5padding_strip
 from threading import Thread
 from responses import ResponseResolver
+from errors import *
 
 class AniDBLink(Thread):
 	def __init__(self,server,port,myport,delay=2,timeout=20):
@@ -52,7 +53,7 @@ class AniDBLink(Thread):
 							tmp=self.crypt.decrypt(tmp)
 							tmp=pkcs5padding_strip(tmp)
 							self.log("DeCry | {}".format(repr(tmp)))
-						if tmp[:2]=='\x00\x00':
+						if tmp[:2]==b'\x00\x00':
 							tmp=zlib.decompressobj().decompress(tmp[2:])
 							self.log("UnZip | {}".format(repr(tmp)))
 						resp=ResponseResolver(tmp)
@@ -88,14 +89,14 @@ class AniDBLink(Thread):
 				self.sock.close()
 				try:cmd.waiter.release()
 				except:pass
-				for tag,cmd in self.cmd_queue.iteritems():
+				for tag,cmd in iter(self.cmd_queue.items()):
 					try:cmd.waiter.release()
 					except:pass
 				sys.exit()
 	
 	def _handle_timeouts(self):
 		willpop=[]
-		for tag,cmd in self.cmd_queue.iteritems():
+		for tag,cmd in iter(self.cmd_queue.items()):
 			if not tag:
 				continue
 			if time()-cmd.started>self.timeout:
