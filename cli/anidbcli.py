@@ -27,7 +27,7 @@ import getopt
 class Main(object):
 	def __init__(self):
 		self.config = Config()
-		self.intr=AniDBInterface(dburl=self.config['dburl'],user=self.config['user'],password=self.config['password'],cache_days=self.config['cache_days'],cache_ended=self.config['cache_ended'])
+		self.intr=AniDBInterface(dburl=self.config['dburl'],user=self.config['user'],password=self.config['password'],cache_days=self.config['cache_days'],cache_ended=self.config['cache_ended'],myport=self.config['listen_port'])
 		try:
 			opts, args = getopt.getopt(sys.argv[1:],"ha:",['help','adbid='])
 		except getopt.GetoptError:

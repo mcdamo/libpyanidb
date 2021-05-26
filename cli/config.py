@@ -32,6 +32,8 @@ class Config(DefaultDict):
 					value=True
 				else:
 					value=False
+			if key=='listen_port':
+				value=int(value)
 			self[key]=value
 		f.close()
 
