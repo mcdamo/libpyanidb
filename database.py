@@ -19,8 +19,10 @@ class Database(object):
 			import os
 			self.connection=sqlite3.connect(os.path.join(server,database))
 		elif dbtype == 'mysql':
-			import MySQLdb
-			self.connection=MySQLdb.connect(host=server,user=username,passwd=password,db=database)
+			#import MySQLdb
+			import pymysql
+			pymysql.install_as_MySQLdb()
+			self.connection=pymysql.connect(host=server,user=username,passwd=password,db=database)
 		else:
 			raise Exception("Unexpected database type: %s" % dbtype)
 		self.db=self.connection.cursor()

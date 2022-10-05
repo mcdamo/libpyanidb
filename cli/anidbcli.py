@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 ## this block loads anidb library from LOCAL RELATIVE path
 ## http://stackoverflow.com/questions/279237/import-a-module-from-a-relative-path
