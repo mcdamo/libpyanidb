@@ -4,11 +4,12 @@ from commands import *
 from errors import *
 
 class AniDBInterface:
-	def __init__(self,clientname='libpyanidb',clientver='3',server='api.anidb.info',port=9000,myport=9876,user=None,password=None,session=None,dburl=None,cache_days=1,cache_ended=False):
+	def __init__(self,clientname='libpyanidb',clientver='3',server='api.anidb.info',port=9000,listen_port=9876,user=None,password=None,session=None,dburl=None,cache_days=1,cache_ended=False,anime_mask=None):
 		self.clientname=clientname
 		self.clientver=clientver
+		self.anime_mask=anime_mask
 
-		self.link=AniDBLink(server,port,myport)
+		self.link=AniDBLink(server,port,listen_port)
 		self.link.session=session
 		self.user=user
 		self.password=password
@@ -37,7 +38,8 @@ class AniDBInterface:
 				callback(resp)
 		
 		#try to get cached result
-		if self.cache and self.db:
+		print(command.command)
+		if self.cache and self.db and not command.command == 'AUTH':
 			cached=command.cached(self,self.db)
 			if cached:
 				if self.mode==0:
@@ -48,6 +50,13 @@ class AniDBInterface:
 					callback_wrapper(cached)
 					return
 
+		#auth before request
+		if not self.authed() and not command.command == 'AUTH':
+			print("auth")
+			self.auth(self.user, self.password)
+		else:
+			print("already auth")
+			print(self.authed())
 		#make live request
 		command.authorize(self.mode,self.link.new_tag(),self.link.session,callback_wrapper)
 		self.link.request(command)
@@ -55,6 +64,8 @@ class AniDBInterface:
 		#handle mode 1 (wait for response)
 		if self.mode==1:
 			command.wait_response()
+			if self.link.banned:
+				raise AniDBError('Banned')
 			try:
 				command.resp
 			except:
@@ -240,55 +251,89 @@ class AniDBInterface:
 		"""
 		return self.handle(BuddyStateCommand(startat),callback)
 
-	def anime(self,aid=None,aname=None,acode=-1,callback=None):
+	def anime(self,aid=None,aname=None,amask=-1,callback=None):
 		"""
 		Get information about an anime
 
 		parameters:
 		aid	- anime id
 		aname	- name of the anime
-		acode	- a bitfield describing what information you want about the anime
+		amask	- a 7-byte bitfield describing what information you want about the anime - represented as hex string
 		
 		structure of parameters:
-		(aid|aname) [acode]
+		(aid|aname) [amask]
 		
-		structure of acode:
-		bit	key		description
-		0	aid		aid
-		1	totaleps	episodes
-		2	lastep		normal ep count
-		3	specials	special ep count
-		4	rating		rating
-		5	votes		vote count
-		6	temprating	temp rating
-		7	tempvotes	temp vote count
-		8	reviewrating	average review rating
-		9	reviews		review count
-		10	aired		air date
-		11	ended		end date
-		12	apid		anime planet id
-		13	annid		anime news network id
-		14	allcid		allcinema id
-		15	anfoid		animenfo id
-		16	url		url
-		17	pic		picname
-		18	year		year
-		19	type		type
-		20	romaji		romaji name
-		21	kanji		kanji name
-		22	name		english name
-		23	othername	other name
-		24	shortnames	short name list
-		25	synonyms	synonym list
-		26	categories	category list
-		27	relatedaids	related aid list
-		28	producernames	producer name list
-		29	producerids	producer id list
-		30	awards		award list
-		31	-	-
+		structure of amask: https://wiki.anidb.net/UDP_API_Definition#ANIME:_Retrieve_Anime_Data
+		- starred* rows indicate included by default
+		- default amask corresponds to hex 'b2f0e0fc000000'
+
+		byt	bit	key	description
+		1*	7	aid			aid
+		1	6	-			dateflags
+		1*	5	year		year
+		1*	4	type		type
+		1	3	relatedaids		related aid list
+		1	2	relatedtypes	related aid type
+		1*	1	-			retired
+		1	0	-			retired
+
+		2*	7	romaji		romaji name
+		2*	6	kanji		kanji name
+		2*	5	name		english name
+		2*	4	othername	other name
+		2	3	shortnames	short name list
+		2	2	synonyms	synonym list
+		2	1	-			retired
+		2	0	-			retired
+
+		3*	7	totaleps	episodes
+		3*	6	eps			highest episode number
+		3*	5	specials	special ep count
+		3	4	aired		air date
+		3	3	ended		end date
+		3	2	url			url
+		3	1	pic			picname
+		3	0	-			retired
+
+		4*	7	rating		rating
+		4*	6	votes		vote count
+		4*	5	temprating	temp rating
+		4*	4	tempvotes	temp vote count
+		4*	3	reviewrating	average review rating
+		4*	2	reviews		review count
+		4	1	awards		award list
+		4	0	agerestricted		is 18+ restricted (API does not return any value)
+
+		5	7	-			retired
+		5	6	annid		ANN id
+		5	5	allcid		allcinema id
+		5	4	anfoid		AnimeNfo id
+		5	3	tags		tag name list
+		5	2	tagids		tag id list
+		5	1	tagweights	tag weight list
+		5	0	-			date record updated
+
+		6	7	-			character id list
+		6	6	-			retired
+		6	5	-			retired
+		6	4	-			retired
+		6	3	-			unused
+		6	2	-			unused
+		6	1	-			unused
+		6	0	-			unused
+
+		7	7	-			specials count
+		7	6	-			credits count
+		7	5	-			other count
+		7	4	-			trailer count
+		7	3	-			parody count
+		7	2	-			unused
+		7	1	-			unused
+		7	0	-			unused
 		
+		NOTE: redundant keys: apid, producernames, producerids
 		"""
-		return self.handle(AnimeCommand(aid,aname,acode),callback)
+		return self.handle(AnimeCommand(aid,aname,amask),callback)
 
 	def episode(self,eid=None,aid=None,aname=None,epno=None,callback=None):
 		"""

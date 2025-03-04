@@ -37,7 +37,8 @@ class Database(object):
 	def execute(self,query,*args):
 		if self.log:
 			fmtQuery = query.replace('?','{}')
-			self.log("DbIO > {}".format(fmtQuery.format(*self.connection.literal(args))))
+			self.log("DbIO > {}".format(fmtQuery.format(*args)))
+			#self.log("DbIO > {}".format(fmtQuery.format(*self.connection.literal(args))))
 		if self.dbtype == 'mysql':
 			query = query.replace('?','%s')
 		if args==():

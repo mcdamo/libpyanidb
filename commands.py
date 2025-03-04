@@ -131,17 +131,22 @@ class BuddyStateCommand(Command):
 
 #first run
 class AnimeCommand(Command):
-	def __init__(self,aid=None,aname=None,acode=None):
+	def __init__(self,aid=None,aname=None,amask=None):
 		if not (aid or aname) or (aid and aname):
 			raise AniDBIncorrectParameterError("You must provide <a(id|name)> for ANIME command")
-		parameters={'aid':aid,'aname':aname,'acode':acode}
+		amask = amask if amask is not None else 'b2f0e0fc000000'
+		parameters={'aid':aid,'aname':aname,'amask':amask}
 		Command.__init__(self,'ANIME',**parameters)
 	
 	def cached(self,intr,db):
+		print('AnimeCommand.cached')
 		aid=self.parameters['aid']
 		aname=self.parameters['aname']
 		
 		names=','.join([code for code in AnimeResponse.acodes if code!=''])
+		# create dummy response to extract the codetail
+		#resp=AnimeResponse(self,None,None,None,[])
+		#names=','.join([code for code in resp.codetail])
 		ruleholder=(aid and 'aid=?' or '(name=? OR romaji=? OR kanji=? OR othername=? OR shortnames RLIKE ? OR synonyms RLIKE ?)')
 		rulevalues=(aid and [aid] or [aname,aname,aname,aname,"('|^)"+aname+"('|$)","('|^)"+aname+"('|$)"])
 		
@@ -176,21 +181,33 @@ class AnimeCommand(Command):
 			return resp
 		
 	def cache(self,intr,db):
-		acode=self.parameters['acode']
-		acode=acode and int(acode) or acode
-		if self.resp.rescode!='230' or self.cached(intr,db) or acode!=-1:
+		if self.resp.rescode!='230' or self.cached(intr,db):
 			return
 
-		codes=AnimeResponse.acodes
+		#amask=self.parameters['amask']
+		#amask=int(amask, 16)
+		#codes=AnimeResponse.acodes
+		# find all requested fields, even those without keys
+		#acodes=tuple([AnimeResponse.acodes[i] for i in range(55) if amask&(2**(55-i))])
+		acodes=[code for code in self.resp.codetail if code != '']
+		print('codes')
+		print(acodes)
 		if len(db.select('atb','aid','aid=?',self.resp.datalines[0]['aid'])):
-			sets='status=status|15,'+','.join([code+'=?' for code in codes if code!=''])
-			values=[self.resp.datalines[0][code] for code in codes if code!='']+[self.resp.datalines[0]['aid']]
+			sets='status=status|15,'+','.join([code+'=?' for code in acodes if code != 'aid'])
+			values=[self.resp.datalines[0][code] for code in acodes if code != 'aid']+[self.resp.datalines[0]['aid']]
+			print('sets')
+			print(sets)
+			print('values')
+			print(values)
 
 			db.update('atb',sets,'aid=?',*values)
 		else:
-			names='status,'+','.join([code for code in AnimeResponse.acodes if code!=''])
-			valueholders='0,'+','.join(['?'for code in AnimeResponse.acodes if code!=''])
-			values=[self.resp.datalines[0][code] for code in AnimeResponse.acodes if code!='']
+			#names='status,'+','.join([code for code in acodes if code!=''])
+			#valueholders='0,'+','.join(['?'for code in acodes if code!=''])
+			#values=[self.resp.datalines[0][code] for code in acodes if code!='']
+			names='status,'+','.join(acodes)
+			valueholders='0,'+','.join(['?' for code in acodes])
+			values=[self.resp.datalines[0][code] for code in acodes]
 		
 			db.insert('atb',names,valueholders,*values)
 

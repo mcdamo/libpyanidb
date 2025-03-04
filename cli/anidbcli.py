@@ -27,7 +27,8 @@ import getopt
 class Main(object):
 	def __init__(self):
 		self.config = Config()
-		self.intr=AniDBInterface(dburl=self.config['dburl'],user=self.config['user'],password=self.config['password'],cache_days=self.config['cache_days'],cache_ended=self.config['cache_ended'],myport=self.config['listen_port'])
+		self.intr=AniDBInterface(**self.config)
+		self.rels = False
 		try:
 			opts, args = getopt.getopt(sys.argv[1:],"ha:",['help','adbid='])
 		except getopt.GetoptError:
@@ -45,9 +46,9 @@ class Main(object):
 				self.adbids = arg.split(',')
 
 	def start(self):
-		self.intr.auth(self.config['user'],self.config['password'])
+		#self.intr.auth(self.intr.user,self.intr.password)
 		for id in self.adbids:
-			ret = self.intr.anime(aid=id)
+			ret = self.intr.anime(aid=id,amask=self.intr.anime_mask)
 			print("{} {} {}".format(id,ret.rescode,ret.resstr))
 
 try:

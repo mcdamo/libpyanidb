@@ -406,56 +406,30 @@ class MylistStatsResponse(Response):
 		self.coderep=()
 
 class AnimeResponse(Response):
-	acodes=('aid', 'totaleps', 'eps', 'specials', 'rating', 'votes', 'temprating', 'tempvotes', 'reviewrating', 'reviews', 'aired', 'ended', 'apid', 'annid', 'allcid', 'anfoid', 'url', 'pic', 'year', 'type', 'romaji', 'kanji', 'name', 'othername', 'shortnames', 'synonyms', 'categories', 'relatedaids', 'producernames', 'producerids', 'awards', '')
+	#acodes=('aid', 'totaleps', 'eps', 'specials', 'rating', 'votes', 'temprating', 'tempvotes', 'reviewrating', 'reviews', 'aired', 'ended', 'apid', 'annid', 'allcid', 'anfoid', 'url', 'pic', 'year', 'type', 'romaji', 'kanji', 'name', 'othername', 'shortnames', 'synonyms', 'categories', 'relatedaids', 'producernames', 'producerids', 'awards', '')
+	# refer to AniDBInterface.anime()
+	acodes=(
+		'aid', '', 'year', 'type', 'relatedaids', 'relatedtypes', '', '', # byte1
+		'romaji', 'kanji', 'name', 'othername', 'shortnames', 'synonyms', '', '', # byte2
+		'totaleps', 'eps', 'specials', 'aired', 'ended', 'url', 'pic', '', # byte3
+		'rating', 'votes', 'temprating', 'tempvotes', 'reviewrating', 'reviews', 'awards', 'agerestricted', #byte4
+		'', 'annid', 'allcid', 'anfoid', 'tags', 'tagids', 'tagweights', '', #byte5
+		'', '', '', '', '', '', '', '', # byte6
+		'', '', '', '', '', '', '', '', # byte7
+		)
 	def __init__(self,cmd,restag,rescode,resstr,datalines):
-		"""
-		attributes:
-
-		data:
-		aid		anime id
-		totaleps	episodes
-		lastep		normal ep count
-		specials	special ep count
-		rating		rating
-		votes		vote count
-		temprating	temp rating
-		tempvotes	temp vote count
-		reviewrating	average review rating
-		reviews		review count
-		aired		air date
-		ended		end date
-		apid		anime planet id
-		annid		anime news network id
-		allcid		allcinema id
-		anfoid		animenfo id
-		url		url
-		pic		picname
-		year		year
-		type		type
-		romaji		romaji name
-		kanji		kanji name
-		name		english name
-		othername	other name
-		shortnames	short name list
-		synonyms	synonym list
-		categories	category list
-		relatedaids	related aid list
-		producernames	producer name list
-		producerids	producer id list
-		awards		award list
-
-		"""
 		Response.__init__(self,cmd,restag,rescode,resstr,datalines)
 		self.codestr='ANIME'
 		self.codehead=()
 		self.coderep=()
 
-		if cmd.command=='RANDOMANIME':
-			acode=1+2+4+8+16+32+64+128+256+512+262144+524288+1048576+2097152+4194304+8388608+16777216+33554432+67108864
-		else:
-			acode=cmd.parameters['acode']
-			acode=int(acode==None and 1+2+4+8+16+32+64+128+256+512+262144+524288+1048576+2097152+4194304+8388608+16777216+33554432+67108864 or acode)
-		self.codetail=tuple([self.acodes[i] for i in range(32) if acode&(2**i) and self.acodes[i]!=''])
+		#if cmd.command=='RANDOMANIME':
+		#	amask=
+		#else:
+		#	amask=cmd.parameters['amask']
+		#	amask=int(amask==None and 'b2f0e0fc000000' or amask, 16)
+		amask=int(cmd.parameters['amask'], 16)
+		self.codetail=tuple([self.acodes[i] for i in range(55) if amask&(2**(55-i))])# and self.acodes[i]!=''])
 
 class AnimeBestMatchResponse(Response):
 	def __init__(self,cmd,restag,rescode,resstr,datalines):

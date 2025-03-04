@@ -8,14 +8,14 @@ from responses import ResponseResolver
 from errors import *
 
 class AniDBLink(Thread):
-	def __init__(self,server,port,myport,delay=2,timeout=20):
+	def __init__(self,server,port,listen_port,delay=2,timeout=20):
 		Thread.__init__(self)
 		self.server=server
 		self.port=port
 		self.target=(server,port)
 		self.sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 		
-		self.sock.bind(('',myport))
+		self.sock.bind(('',listen_port))
 		self.sock.settimeout(timeout)
 
 		self.cmd_queue={None:None}
